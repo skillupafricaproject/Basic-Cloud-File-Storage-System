@@ -1,0 +1,19 @@
+{
+  "name": "basic-cloud-file-storage-system",
+  "version": "1.0.0",
+  "description": "SkillUp Africa Backend Project on Basic Cloud File Storage System",
+  "main": "createFile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tboy-AK/Basic-Cloud-File-Storage-System.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tboy-AK/Basic-Cloud-File-Storage-System/issues"
+  },
+  "homepage": "https://github.com/Tboy-AK/Basic-Cloud-File-Storage-System#readme"
+}
