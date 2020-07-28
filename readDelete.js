@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const path = require('path');
 
@@ -17,11 +18,24 @@ const readFile = function (id) {
   } catch (err) {
     return {
       status: 404,
-      message: 'No such file',
+      message: err.message,
     };
   }
 };
 
-const deleteFile = function (id) { };
+const deleteFile = (id) => {
+  try {
+    fs.unlinkSync(path.resolve(__dirname, `${id}.txt`));
+    return {
+      status: 200,
+      message: `File ${id}.txt deleted successfully`,
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.message,
+    };
+  }
+};
 
 module.exports = { readFile, deleteFile };
