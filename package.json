@@ -2,7 +2,7 @@
   "name": "Basic-Cloud-File-Storage-System",
   "version": "1.0.0",
   "description": "SkillUp Africa Backend Project on Basic Cloud File Storage System",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon main",
     "start": "node main",
