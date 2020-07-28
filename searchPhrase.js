@@ -1,14 +1,12 @@
 const url = require("url");
 const fs = require("fs");
 
-const current_url = new URL(url);
+const current_url = url.parse(address, true); //where address is the path url
+const phrase = req.query.phrase;
 
-const search_params = current_url.searchParams.get("phrase");
-console.log(search_params);
+const files = fs.readdirSync(username);
 
-const files = fs.readdirSync(testFolder);
-
-phraseFIles = files.filter((e) => {
-  readFileSync(e).toString();
+phraseFIles = files.filter((file) => {
+  readFileSync(file).toString();
   return fileincludes(phrase);
 });
