@@ -1,21 +1,33 @@
-const deleteFile = require('../controllers/deleteFile');
+const fs = require('fs');
+const path = require('path');
+const { deleteFile } = require('../controllers/filesController')(
+  fs, path, {}, { writeHead: () => { }, write: () => { }, end: () => { } }
+);
 
 describe('Delete file named with a number', () => {
   describe('that exists', () => {
-    const existingFile = 2;
-    const existingUser = 'tboyak';
+    const route = {
+      query: {
+        fileId: 2, username: 'tboyak'
+      }
+    };
+
     it('responds success status 200', () => {
-      const response = deleteFile(existingFile, existingUser);
-      expect(response.status).toEqual(200);
+      const response = deleteFile(route);
+      expect(response.statusCode).toEqual(200);
     });
   });
 
   describe('that does not exist', () => {
-    const nonExistingFile = `${-0}`;
-    const nonExistingUser = `non existing user`;
+    const route = {
+      query: {
+        fileId: `${-0}`, username: 'non existing user'
+      }
+    };
+
     it('responds error status 404', () => {
-      const response = deleteFile(nonExistingFile, nonExistingUser);
-      expect(response.status).toEqual(404);
+      const response = deleteFile(route);
+      expect(response.statusCode).toEqual(404);
     });
   });
 });

@@ -1,54 +1,48 @@
-const EventEmitter = require('events');
-const readFile = require('./controllers/readFile');
-const deleteFile = require('./controllers/deleteFile');
+const fs = require('fs');
+const path = require('path');
+const http = require('http');
+const url = require('url');
+const usersController = require('./controllers/usersController');
+const filesController = require('./controllers/filesController');
+const statsController = require('./controllers/statsController');
 
-class Server extends EventEmitter {
-  constructor(client) {
-    super();
-    process.nextTick(() => {
-      this.emit('response', 'Type a command (`help` to list commands)');
-    });
-    client.on('command', (command, args) => {
-      switch (command) {
-        case 'help':
-        case 'create':
-        case 'read':
-        case 'update':
-        case 'delete':
-          this[command](args);
-          break;
+const port = parseInt(process.env.PORT) || 3000;
 
-        default:
-          this.emit('response', `Unknown command ('help' to list commands) => ${command} ${args}`);
-          break;
-      }
-    });
+const server = http.createServer((req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  const reqMethod = req.method;
+  const route = url.parse(req.url, true);
+  const { pathname } = route;
+  if (pathname == '/users') {
+    const { createNewUser } = usersController(fs, path, req, res);
+
+    if (reqMethod === 'POST') createNewUser();
   }
 
-  help(args) {
-    this.emit('response', `Available Commands:
-    create <username> <content>
-    read <fileID> <username>
-    update <fileID> <username>
-    delete <fileID> <username>
-    `);
+  if (pathname == '/files') {
+    const {
+      readFile, createNewFile, updateFile, deleteFile
+    } = filesController(fs, path, req, res);
+
+    if (reqMethod === 'GET') readFile(route);
+    if (reqMethod === 'POST') createNewFile();
+    if (reqMethod === 'PUT') updateFile(route);
+    if (reqMethod === 'DELETE') deleteFile(route);
   }
 
-  create(args) {
-    this.emit('response', `File created successfully => ${args.join(' ')}`);
-  }
+  if (pathname == '/stats') {
+    const { getStats } = statsController(fs, path, req, res);
 
-  read(args) {
-    console.log(args);
-    this.emit('response', JSON.stringify(readFile(args[0], args[1])));
+    if (reqMethod === 'GET') getStats(route);
   }
+});
 
-  update(args) { }
+switch (process.env.NODE_ENV) {
+  case 'test':
+    module.exports = () => server;
+    break;
 
-  delete(args) {
-    console.log(args);
-    this.emit('response', JSON.stringify(deleteFile(args[0], args[1])));
-  }
+  default:
+    server.listen(port, () => console.log(`server running`));
+    break;
 }
-
-module.exports = (client) => new Server(client);
