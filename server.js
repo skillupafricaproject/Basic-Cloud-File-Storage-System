@@ -9,18 +9,17 @@ const statsController = require('./controllers/statsController');
 const port = parseInt(process.env.PORT) || 3000;
 
 const server = http.createServer((req, res) => {
-  const reqUrl = req.url;
+  res.setHeader('Content-Type', 'application/json');
   const reqMethod = req.method;
-
-  if (reqUrl == '/users') {
-    const route = url.parse(reqUrl, true);
+  const route = url.parse(req.url, true);
+  const { pathname } = route;
+  if (pathname == '/users') {
     const { createNewUser } = usersController(fs, path, req, res);
 
     if (reqMethod === 'POST') createNewUser();
   }
 
-  if (reqUrl == '/files') {
-    const route = url.parse(reqUrl, true);
+  if (pathname == '/files') {
     const {
       readFile, createNewFile, updateFile, deleteFile
     } = filesController(fs, path, req, res);
@@ -31,11 +30,10 @@ const server = http.createServer((req, res) => {
     if (reqMethod === 'DELETE') deleteFile(route);
   }
 
-  if (reqUrl == '/stats') {
-    const route = url.parse(reqUrl, true);
+  if (pathname == '/stats') {
     const { getStats } = statsController(fs, path, req, res);
 
-    if (reqMethod === 'get') getStats(route);
+    if (reqMethod === 'GET') getStats(route);
   }
 });
 
