@@ -1,13 +1,18 @@
 const fs = require('fs');
 
 const createFile = (filePath, fileContent) => {
-  fs.writeFileSync(filePath, fileContent, (error) => {
-  if (error) {
-  console.error('An error occured: ', error);
-  } else {
-  console.log ('Your file is created');
+  try {
+    fs.writeFileSync(filePath, fileContent);
+    return {
+      status: 200,
+      message: 'New file created'
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      message: error.message
+    }
   }
-  });
-  }
+}
 
-  createFile(path, content);
+createFile(path, content);
