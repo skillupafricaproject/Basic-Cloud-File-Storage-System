@@ -1,28 +1,36 @@
 const fs = require('fs');
 const http = require('http');
-const port = 4000;
-const server = http.createServer(function (req, res) {
+const path = require('path');
+
+const server = http.createServer((req, res) => {
   const responseJson = {};
   if (req.url == '/register') {
+    // Handle POST request
     let data;
     req.on('data', chunk => {
       data = chunk;
     })
     req.on('end', () => {
-      var body = JSON.parse(data);
+      let body = JSON.parse(data);
       console.dir(body);
-      var username = body.username;
-      if (!fs.existsSync(username)) {
-        fs.mkdirSync(username);
-        responseJson['message'] = "Success";
-      } else {
-        responseJson['error'] = "Already exists";
-      }
-      res.write(JSON.stringify(responseJson));
-      res.end();
+      const username = body.username;
+      fs.mkdir(path.join(__dirname, username), (err) => {
+        if (err) {
+          responseJson['error'] = "Already exists";
+          console.log(responseJson);
+        } else {
+          responseJson['message'] = "Success";
+          console.log(responseJson);
+        }
+        res.write(JSON.stringify(responseJson));
+        res.end();
+      });
     });
   }
 });
-server.listen(port, () => {
-  console.log(`server running`)
+
+const PORT = process.env.PORT || 4000;
+
+server.listen(PORT, () => {
+  console.log(`server running on port ${PORT}`)
 });
