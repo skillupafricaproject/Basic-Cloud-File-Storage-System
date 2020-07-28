@@ -4,6 +4,8 @@
   "description": "SkillUp Africa Backend Project on Basic Cloud File Storage System",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon main",
+    "start": "node main",
     "test": "jasmine"
   },
   "repository": {

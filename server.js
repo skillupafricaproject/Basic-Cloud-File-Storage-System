@@ -1,4 +1,6 @@
 const EventEmitter = require('events');
+const readFile = require('./controllers/readFile');
+const deleteFile = require('./controllers/deleteFile');
 
 class Server extends EventEmitter {
   constructor(client) {
@@ -17,7 +19,7 @@ class Server extends EventEmitter {
           break;
 
         default:
-          this.emit('response', 'Unknown command (`help` to list commands)');
+          this.emit('response', `Unknown command ('help' to list commands) => ${command} ${args}`);
           break;
       }
     });
@@ -25,10 +27,10 @@ class Server extends EventEmitter {
 
   help(args) {
     this.emit('response', `Available Commands:
-    create <parameter>
-    read <parameter>
-    update <parameter>
-    delete <parameter>
+    create <username> <content>
+    read <fileID> <username>
+    update <fileID> <username>
+    delete <fileID> <username>
     `);
   }
 
@@ -36,11 +38,17 @@ class Server extends EventEmitter {
     this.emit('response', `File created successfully => ${args.join(' ')}`);
   }
 
-  read(args) { }
+  read(args) {
+    console.log(args);
+    this.emit('response', JSON.stringify(readFile(args[0], args[1])));
+  }
 
   update(args) { }
 
-  delete(args) { }
+  delete(args) {
+    console.log(args);
+    this.emit('response', JSON.stringify(deleteFile(args[0], args[1])));
+  }
 }
 
 module.exports = (client) => new Server(client);
