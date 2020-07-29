@@ -47,7 +47,7 @@ const filesController = (fs, path, req, res) => {
 
       let drives;
       try {
-        drives = fs.readdirSync(path.resolve(`./database/drives/${username}`));
+        drives = fs.readdirSync(path.resolve(__dirname, `../database/drives/${username}`));
       } catch (err) {
         if (err.code === 'ENOENT') resJson.statusCode = 404;
         else resJson.statusCode = 500;
@@ -57,6 +57,7 @@ const filesController = (fs, path, req, res) => {
         res.end();
         return resJson;
       }
+      console.log('drives', drives, username);
 
       for (let i = 0; i < users.length; i++) {
         if (users[i].username === username) {
@@ -86,9 +87,9 @@ const filesController = (fs, path, req, res) => {
         return resJson;
       }
 
-      let id = parseInt(drives[drives.length - 1].slice(0, drives.lastIndexOf('.')), 10);
+      let id = drives.length === 0 ? 0 : parseInt(drives[drives.length - 1].slice(0, drives.lastIndexOf('.')), 10);
       try {
-        fs.writeFileSync(`./database/drives/${username}/${id++}.txt`, fileContent);
+        fs.writeFileSync(`./database/drives/${username}/${++id}.txt`, fileContent);
         resJson.statusCode = 201;
         resJson.message = 'New file created';
         res.writeHead(resJson.statusCode);
