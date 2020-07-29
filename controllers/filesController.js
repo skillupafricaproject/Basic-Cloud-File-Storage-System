@@ -3,34 +3,85 @@ const serverStats = require('../database/stats/server-stats.json');
 
 const filesController = (fs, path, req, res) => {
   const readFile = (route) => {
-    const { fileId, username } = route.query;
+    const { fileId, username, phrase } = route.query;
     const resJson = {};
 
-    try {
-      const dataBuffer = fs.readFileSync(
-        path.resolve(__dirname, `../database/drives/${username}/${fileId}.txt`),
-      );
-      const fileContent = dataBuffer.toString();
+    if (phrase) {
+      try {
+        const files = fs.readdirSync(path.resolve(__dirname, `../database/drives/${username}`));
 
-      resJson.statusCode = 200;
-      resJson.data = {
-        file: {
-          id: `${fileId}.txt`, content: fileContent,
-        },
-      };
+        if (files.length === 0) {
+          throw new Error('No files available');
+        }
 
-      res.writeHead(resJson.statusCode);
-      res.write(JSON.stringify(resJson.data));
-      res.end();
-      return resJson;
-    } catch (err) {
-      if (err.code === 'ENOENT') resJson.statusCode = 404;
-      else resJson.statusCode = 500;
-      resJson.message = err.message;
-      res.writeHead(resJson.statusCode);
-      res.write(resJson.message);
-      res.end();
-      return resJson;
+        const phraseFiles = files.filter((file) => {
+          const fileContent = fs
+            .readFileSync(path.resolve(__dirname, `../database/drives/${username}/${file}`))
+            .toString();
+          return fileContent.includes(phrase);
+        });
+
+        if (phraseFiles && phraseFiles.length === 0) {
+          throw new Error('No such files');
+        }
+
+        const responseData = phraseFiles.map((e) => ({
+          file: e,
+          fileEndpoint: `/files/?username=${username}&fileId=${e.slice(0, e.lastIndexOf('.'))}`,
+          fileContent: fs
+            .readFileSync(path.resolve(__dirname, `../database/drives/${username}/${e}`))
+            .toString(),
+        }));
+
+        resJson.statusCode = 200;
+        resJson.data = responseData;
+        res.writeHead(resJson.statusCode);
+        res.write(JSON.stringify(resJson.data));
+        res.end();
+        return resJson;
+      } catch (err) {
+        if (err.code === 'ENOENT') resJson.statusCode = 404;
+        else if (err.message === 'No files available') {
+          resJson.statusCode = 204;
+          resJson.message = 'No files available';
+        } else if (err.message === 'No such files') {
+          resJson.statusCode = 204;
+          resJson.message = 'No such files';
+          resJson.data = [];
+        } else resJson.statusCode = 500;
+        resJson.message = err.message;
+        res.writeHead(resJson.statusCode);
+        res.write(resJson.message);
+        res.end();
+        return resJson;
+      }
+    } else {
+      try {
+        const dataBuffer = fs.readFileSync(
+          path.resolve(__dirname, `../database/drives/${username}/${fileId}.txt`),
+        );
+        const fileContent = dataBuffer.toString();
+
+        resJson.statusCode = 200;
+        resJson.data = {
+          file: {
+            id: `${fileId}.txt`, content: fileContent,
+          },
+        };
+
+        res.writeHead(resJson.statusCode);
+        res.write(JSON.stringify(resJson.data));
+        res.end();
+        return resJson;
+      } catch (err) {
+        if (err.code === 'ENOENT') resJson.statusCode = 404;
+        else resJson.statusCode = 500;
+        resJson.message = err.message;
+        res.writeHead(resJson.statusCode);
+        res.write(resJson.message);
+        res.end();
+        return resJson;
+      }
     }
   };
 
@@ -57,7 +108,6 @@ const filesController = (fs, path, req, res) => {
         res.end();
         return resJson;
       }
-      console.log('drives', drives, username);
 
       for (let i = 0; i < users.length; i++) {
         if (users[i].username === username) {
