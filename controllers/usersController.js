@@ -1,12 +1,12 @@
-const usersController = (fs, path, req, res) => {
-  const users = require('../database/users.json');
-  const serverStats = require('../database/stats/server-stats.json');
+const users = require('../database/users.json');
+const serverStats = require('../database/stats/server-stats.json');
 
+const usersController = (fs, path, req, res) => {
   const createNewUser = () => {
     let data;
     const resJson = {};
 
-    req.on('data', chunk => {
+    req.on('data', (chunk) => {
       data = chunk;
     });
     req.on('end', () => {
@@ -14,9 +14,11 @@ const usersController = (fs, path, req, res) => {
       const dirPath = path.resolve(__dirname, `../database/drives/${username}`);
 
       if (!fs.existsSync(dirPath)) {
-        const newNumberOfUsers = users.push({ username, password });
-        serverStats.no_of_users = newNumberOfUsers;
-        serverStats.no_of_folders = newNumberOfUsers;
+        const newNumberOfUsers = users.push({
+          username, password, totalFilesCreated: 0, totalFilesPresent: 0,
+        });
+        serverStats.totalUsers = newNumberOfUsers;
+        serverStats.totalFolders = newNumberOfUsers;
         fs.mkdirSync(dirPath);
 
         try {
@@ -38,19 +40,19 @@ const usersController = (fs, path, req, res) => {
         }
 
         resJson.statusCode = 201;
-        resJson.message = "Success";
+        resJson.message = 'Success';
       } else {
-        resJson.statusCode = 403;
-        resJson.message = "Username taken. Choose a different username";
+        resJson.statusCode = 400;
+        resJson.message = 'Username taken. Choose a different username';
       }
 
       res.writeHead(resJson.statusCode);
       res.end(resJson.message);
       return resJson;
     });
-  }
+  };
 
   return { createNewUser };
-}
+};
 
 module.exports = usersController;

@@ -1,1 +1,9 @@
-{}
+{
+  "totalUsers": 0,
+  "totalFolders": 0,
+  "totalFiles": 0,
+  "maxUser": {
+    "fileCount": 0,
+    "user": ""
+  }
+}
