@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/Tboy-AK/Basic-Cloud-File-Storage-System#readme",
   "devDependencies": {
+    "eslint": "^7.5.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
     "jasmine": "^3.6.1"
   }
 }
